@@ -14,15 +14,44 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { Grid } from '@mui/material';
 import Typography from '@mui/material/Typography';
+import CircularProgress from '@mui/material/CircularProgress';
+import Fade from '@mui/material/Fade';
 
 export default function App() {
   const [searchDialogOpen, setsearchDialogOpen] = React.useState(false);
   const [disableSearch, setDisableSearch] = React.useState(true);
   const handleSearchDialogOpen = () => setsearchDialogOpen(true);
-  const searchAction = () => {
+  const [query, setQuery] = React.useState('idle');
+  const timerRef = React.useRef();
+  const searchAction = (event) => {
+    console.warn('search action');
     setsearchDialogOpen(false);
+    handleClickQuery();
     //Loading
     //toast message
+  };
+
+  const getSuccessElement = () => {
+    console.log('getSuccessElement');
+    return <Typography>Success!</Typography>;
+  };
+
+  const handleClickQuery = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+
+    if (query !== 'idle') {
+      setQuery('idle');
+      return;
+    }
+    setQuery('progress');
+    console.log('inside handleClick');
+    timerRef.current = window.setTimeout(() => {
+      console.log('current: ');
+      setQuery('success');
+    }, 2000);
+    console.log('inside handleClick');
   };
 
   const [searchFields, setSearchFields] = React.useState({
@@ -41,24 +70,24 @@ export default function App() {
 
   const handleSearchFeildOnChanges = (event, param) => {
     let obj = {};
-    if(param === 'publicationYear')
-    event.target.value = event.target.value.replace(/\D/g, "");
+    if (param === 'publicationYear')
+      event.target.value = event.target.value.replace(/\D/g, '');
     obj[param] = event.target.value;
-      console.log(event.target.value);
-      setSearchFields((prevSearchFields) => ({
-        ...prevSearchFields,
-        ...obj,
-      }));
+    console.log(event.target.value);
+    setSearchFields((prevSearchFields) => ({
+      ...prevSearchFields,
+      ...obj,
+    }));
   };
 
   const handleSortFeildOnChanges = (event, param) => {
     let obj = {};
-      obj[param] = event.target.value;
-      console.log(event.currentTarget.value);
-      setSortingParameters((prevSearchFields) => ({
-        ...prevSearchFields,
-        ...obj,
-      }));
+    obj[param] = event.target.value;
+    console.log(event.currentTarget.value);
+    setSortingParameters((prevSearchFields) => ({
+      ...prevSearchFields,
+      ...obj,
+    }));
   };
 
   React.useEffect(() => {
@@ -103,7 +132,6 @@ export default function App() {
                     id="name_search"
                     label="Name"
                     variant="outlined"
-                    
                     onChange={(event) => {
                       handleSearchFeildOnChanges(event, 'bookName');
                     }}
@@ -165,7 +193,7 @@ export default function App() {
                     label="Publication Year (YYYY)"
                     variant="outlined"
                     //type="number"
-                    inputProps={{ maxLength: 4  }}
+                    inputProps={{ maxLength: 4 }}
                     // inputProps={{  }}
                     onChange={(event) => {
                       handleSearchFeildOnChanges(event, 'publicationYear');
@@ -227,6 +255,23 @@ export default function App() {
           </div>
         </Toolbar>
       </AppBar>
+      <Box
+        sx={{ height: '100%', position: 'absolute', top: '50%', left: '50%' }}
+      >
+        {query === 'success' ? (
+          getSuccessElement()
+        ) : (
+          <Fade
+            in={query === 'progress'}
+            style={{
+              transitionDelay: query === 'progress' ? '800ms' : '0ms',
+            }}
+            unmountOnExit
+          >
+            <CircularProgress />
+          </Fade>
+        )}
+      </Box>
     </Box>
   );
 }
