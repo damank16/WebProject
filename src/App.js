@@ -41,17 +41,18 @@ export default function App() {
 
   const handleSearchFeildOnChanges = (event, param) => {
     let obj = {};
+    if(param === 'publicationYear')
+    event.target.value = event.target.value.replace(/\D/g, "");
     obj[param] = event.target.value;
-    setSearchFields((prevSearchFields) => ({
-      ...prevSearchFields,
-      ...obj,
-    }));
+      console.log(event.target.value);
+      setSearchFields((prevSearchFields) => ({
+        ...prevSearchFields,
+        ...obj,
+      }));
   };
 
   const handleSortFeildOnChanges = (event, param) => {
     let obj = {};
-    const re = /^[0-9\b]+$/;
-    // if(param === 'publicationYear' && regex.test(event.target.value))
       obj[param] = event.target.value;
       console.log(event.currentTarget.value);
       setSortingParameters((prevSearchFields) => ({
